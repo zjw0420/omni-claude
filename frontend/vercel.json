@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://omni-claude.onrender.com/:path*"
+      "destination": "https://endearing-manifestation-production.up.railway.app/:path*"
     }
   ]
 }

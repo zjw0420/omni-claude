@@ -1,13 +1,14 @@
 from fastapi import FastAPI, HTTPException, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import httpx, json, os, time, jwt
 
 app = FastAPI()
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 
-JWT_SECRET = os.getenv("JWT_SECRET", "dev-secret-set-in-render-dashboard")
+JWT_SECRET = os.getenv("JWT_SECRET", "dev-secret-set-in-production")
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRY_HOURS = 24
 
@@ -31,12 +32,9 @@ def create_session_token(model_id: str, api_key: str) -> str:
     cfg = MODELS[model_id]
     now = int(time.time())
     payload = {
-        "model_id": model_id,
-        "api_key": api_key,
-        "base_url": cfg["base_url"],
-        "model": cfg["model"],
-        "model_name": cfg["name"],
-        "iat": now,
+        "model_id": model_id, "api_key": api_key,
+        "base_url": cfg["base_url"], "model": cfg["model"],
+        "model_name": cfg["name"], "iat": now,
         "exp": now + JWT_EXPIRY_HOURS * 3600,
     }
     return jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
@@ -99,3 +97,17 @@ async def chat(req: ChatRequest, authorization: str = Header(None)):
                 yield f"data: [DONE]{NL}{NL}"
 
     return StreamingResponse(generate(), media_type="text/event-stream")
+
+
+# Serve frontend static files - MUST be after all API routes
+STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
+if os.path.isdir(STATIC_DIR):
+    app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="static")
+
+@app.get("/debug")
+async def debug():
+    import os as _os
+    wd = _os.getcwd()
+    items = _os.listdir(wd)
+    sub = _os.listdir("static") if _os.path.isdir("static") else "NO STATIC DIR"
+    return {"cwd": wd, "items": items, "static": sub}
