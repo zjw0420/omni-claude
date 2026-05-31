@@ -49,12 +49,16 @@ def decode_session_token(token: str) -> dict:
         raise HTTPException(status_code=401, detail="Invalid session token")
 
 
+# ── API Routes ──
+
 @app.get("/health")
+@app.get("/api/health")
 async def health():
     return {"status": "ok"}
 
 
 @app.post("/start")
+@app.post("/api/start")
 async def start(req: StartRequest):
     if req.model_id not in MODELS:
         raise HTTPException(status_code=400, detail=f"Unknown model: {req.model_id}")
@@ -63,11 +67,13 @@ async def start(req: StartRequest):
 
 
 @app.post("/login")
+@app.post("/api/login")
 async def login(req: StartRequest):
     return await start(req)
 
 
 @app.post("/chat")
+@app.post("/api/chat")
 async def chat(req: ChatRequest, authorization: str = Header(None)):
     if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Missing or invalid Authorization header")
@@ -99,28 +105,7 @@ async def chat(req: ChatRequest, authorization: str = Header(None)):
     return StreamingResponse(generate(), media_type="text/event-stream")
 
 
-# Serve frontend static files - MUST be after all API routes
+# ── Frontend static files (LAST) ──
 STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
 if os.path.isdir(STATIC_DIR):
     app.mount("/", StaticFiles(directory=STATIC_DIR, html=True), name="static")
-
-@app.get("/debug")
-async def debug():
-    import os as _os
-    wd = _os.getcwd()
-    items = _os.listdir(wd)
-    sub = _os.listdir("static") if _os.path.isdir("static") else "NO STATIC DIR"
-    return {"cwd": wd, "items": items, "static": sub}
-
-# API prefix aliases
-@app.get("/api/health")
-async def api_health():
-    return {"status": "ok"}
-
-@app.post("/api/start")
-async def api_start(req: StartRequest):
-    return await start(req)
-
-@app.post("/api/chat")
-async def api_chat(req: ChatRequest, authorization: str = Header(None)):
-    return await chat(req, authorization)
