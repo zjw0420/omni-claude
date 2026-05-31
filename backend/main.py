@@ -7,7 +7,7 @@ import httpx, json, os, time, jwt
 app = FastAPI()
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
 
-JWT_SECRET = os.getenv("JWT_SECRET", "dev-secret-change-in-production")
+JWT_SECRET = os.getenv("JWT_SECRET", "dev-secret-set-in-render-dashboard")
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRY_HOURS = 24
 
