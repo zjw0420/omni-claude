@@ -111,3 +111,16 @@ async def debug():
     items = _os.listdir(wd)
     sub = _os.listdir("static") if _os.path.isdir("static") else "NO STATIC DIR"
     return {"cwd": wd, "items": items, "static": sub}
+
+# API prefix aliases
+@app.get("/api/health")
+async def api_health():
+    return {"status": "ok"}
+
+@app.post("/api/start")
+async def api_start(req: StartRequest):
+    return await start(req)
+
+@app.post("/api/chat")
+async def api_chat(req: ChatRequest, authorization: str = Header(None)):
+    return await chat(req, authorization)
