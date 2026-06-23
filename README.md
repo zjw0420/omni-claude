@@ -2,6 +2,8 @@
 
 A self-hosted web chat app that connects to multiple AI model providers through a unified interface.
 
+**Live Demo:** [endearing-manifestation-production.up.railway.app](https://endearing-manifestation-production.up.railway.app)
+
 ## Features
 
 - **Multi-model support**: DeepSeek V4 Pro, Qwen Max, Doubao Pro
