@@ -1,6 +1,6 @@
 # Omni Claude — Multi-Model AI Chat Assistant
 
-A self-hosted web chat app that connects to multiple AI model providers through a unified interface.
+A multi-model AI aggregation gateway — one interface to access DeepSeek, Qwen, and Doubao with unified streaming, JWT session security, and zero server-side key storage.
 
 **Live Demo:** [endearing-manifestation-production.up.railway.app](https://endearing-manifestation-production.up.railway.app)
 
